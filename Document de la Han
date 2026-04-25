@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator lemn, mobil PDF</title>
+  <style>
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --line:#d8e0ea;
+      --text:#1f2937;
+      --muted:#667085;
+      --primary:#155a93;
+      --primary-2:#0b4a7b;
+      --ok:#0b6e4f;
+      --soft:#eef5fc;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .container{
+      max-width:760px;
+      margin:0 auto;
+      padding:12px;
+    }
+    .header{
+      background:linear-gradient(180deg, var(--primary), var(--primary-2));
+      color:#fff;
+      border-radius:16px;
+      padding:18px 16px;
+      box-shadow:0 8px 24px rgba(13,34,62,.12);
+      margin-bottom:12px;
+    }
+    .header h1{
+      margin:0 0 6px 0;
+      font-size:22px;
+      line-height:1.2;
+    }
+    .header p{
+      margin:0;
+      font-size:14px;
+      opacity:.95;
+    }
+    .totals{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .total-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      box-shadow:0 4px 14px rgba(16,24,40,.05);
+    }
+    .label{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .big{
+      font-size:28px;
+      font-weight:700;
+      color:var(--ok);
+    }
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 4px 14px rgba(16,24,40,.05);
+      margin-bottom:12px;
+    }
+    .panel h2{
+      margin:0 0 12px 0;
+      font-size:18px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .field.full{
+      grid-column:1 / -1;
+    }
+    .field label{
+      font-size:13px;
+      color:var(--muted);
+    }
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border:1px solid #c9d3df;
+      border-radius:12px;
+      font-size:16px;
+      background:#fff;
+      color:var(--text);
+    }
+    input[readonly]{
+      background:#f7fafc;
+      font-weight:700;
+    }
+    .btns{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    button{
+      border:none;
+      border-radius:12px;
+      padding:13px 12px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
+    .btn-secondary{
+      background:#edf3fa;
+      color:var(--primary);
+      border:1px solid #cdd9e6;
+    }
+    .btn-danger{
+      background:#fff1f2;
+      color:#b42318;
+      border:1px solid #fecdd3;
+    }
+    .item{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+      background:linear-gradient(180deg, #fff, #fbfdff);
+    }
+    .item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .item-title{
+      font-weight:700;
+      font-size:16px;
+    }
+    .item-sub{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .badge{
+      background:var(--soft);
+      color:var(--primary);
+      border:1px solid #d4e4f5;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .item-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px 12px;
+      margin-top:10px;
+    }
+    .kv{
+      font-size:14px;
+    }
+    .kv span{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:2px;
+    }
+    .actions{
+      display:flex;
+      gap:8px;
+      margin-top:12px;
+    }
+    .actions button{
+      flex:1;
+      padding:10px 12px;
+      font-size:14px;
+    }
+    .summary-table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    .summary-table th, .summary-table td{
+      border:1px solid var(--line);
+      padding:8px;
+      text-align:left;
+    }
+    .summary-table th{
+      background:#eef4fb;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .empty{
+      text-align:center;
+      padding:18px 10px;
+      color:var(--muted);
+      border:1px dashed #cfd8e3;
+      border-radius:14px;
+      background:#fbfdff;
+    }
+    @media (max-width:560px){
+      .totals,.grid,.btns,.item-grid{
+        grid-template-columns:1fr;
+      }
+      .big{font-size:24px}
+      .header h1{font-size:20px}
+      .container{padding:10px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Calculator materiale lemnoase, mobil</h1>
+      <p>Introduceți datele pe telefon. Aplicația calculează automat volumul și valoarea.</p>
+    </div>
+
+    <div class="totals">
+      <div class="total-card">
+        <div class="label">Volum total</div>
+        <div class="big" id="volumTotal">0,000 mc</div>
+      </div>
+      <div class="total-card">
+        <div class="label">Valoare totală</div>
+        <div class="big" id="valoareTotal">0,00 RON</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Adaugă material</h2>
+      <div class="grid">
+        <div class="field full">
+          <label>Tip material</label>
+          <select id="tip">
+            <option value="">Alege</option>
+            <option>Grindă</option>
+            <option>Lăturoaie</option>
+            <option>Scândură dimensionată</option>
+            <option>Scândură astereală</option>
+            <option>Cherestea</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Lungime, m</label>
+          <input id="lungime" inputmode="decimal" placeholder="ex. 4" />
+        </div>
+        <div class="field">
+          <label>Lățime, m</label>
+          <input id="latime" inputmode="decimal" placeholder="ex. 0,12" />
+        </div>
+        <div class="field">
+          <label>Grosime, m</label>
+          <input id="grosime" inputmode="decimal" placeholder="ex. 0,05" />
+        </div>
+        <div class="field">
+          <label>Bucăți</label>
+          <input id="bucati" inputmode="numeric" placeholder="ex. 10" />
+        </div>
+        <div class="field">
+          <label>Preț pe bucată, RON</label>
+          <input id="pretBuc" inputmode="decimal" placeholder="opțional" />
+        </div>
+        <div class="field">
+          <label>Preț pe mc, RON</label>
+          <input id="pretMc" inputmode="decimal" placeholder="opțional" />
+        </div>
+
+        <div class="field">
+          <label>Volum pe bucată</label>
+          <input id="prevVolBuc" readonly />
+        </div>
+        <div class="field">
+          <label>Volum total</label>
+          <input id="prevVolTot" readonly />
+        </div>
+        <div class="field">
+          <label>Preț calculat pe bucată</label>
+          <input id="prevPretBuc" readonly />
+        </div>
+        <div class="field">
+          <label>Preț calculat pe mc</label>
+          <input id="prevPretMc" readonly />
+        </div>
+        <div class="field full">
+          <label>Valoare totală</label>
+          <input id="prevValTot" readonly />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="btn-primary" id="btnAdd">Adaugă în listă</button>
+        <button class="btn-secondary" id="btnDemo">Exemplu</button>
+        <button class="btn-secondary" id="btnSave">Generează PDF</button>
+        <button class="btn-danger" id="btnClearAll">Șterge tot</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Lista materialelor</h2>
+      <div id="items"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Sinteză pe tip material</h2>
+      <div id="summaryWrap"></div>
+      <p class="muted">Regula de calcul este aceeași: puteți introduce prețul pe bucată sau prețul pe metru cub. Dacă sunt introduse ambele, are prioritate prețul pe mc.</p>
+    </div>
+  </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  const els = {
+    tip: document.getElementById("tip"),
+    lungime: document.getElementById("lungime"),
+    latime: document.getElementById("latime"),
+    grosime: document.getElementById("grosime"),
+    bucati: document.getElementById("bucati"),
+    pretBuc: document.getElementById("pretBuc"),
+    pretMc: document.getElementById("pretMc"),
+    prevVolBuc: document.getElementById("prevVolBuc"),
+    prevVolTot: document.getElementById("prevVolTot"),
+    prevPretBuc: document.getElementById("prevPretBuc"),
+    prevPretMc: document.getElementById("prevPretMc"),
+    prevValTot: document.getElementById("prevValTot"),
+    volumTotal: document.getElementById("volumTotal"),
+    valoareTotal: document.getElementById("valoareTotal"),
+    items: document.getElementById("items"),
+    summaryWrap: document.getElementById("summaryWrap")
+  };
+
+  const TYPES = ["Grindă", "Lăturoaie", "Scândură dimensionată", "Scândură astereală", "Cherestea"];
+  let rows = loadRows();
+
+  function parseNum(v){
+    const s = String(v ?? "").trim().replace(/\s/g, "").replace(",", ".");
+    if (!s) return "";
+    const n = Number(s);
+    return Number.isFinite(n) ? n : "";
+  }
+  function fmt3(n){ return Number(n || 0).toLocaleString("ro-RO",{minimumFractionDigits:3, maximumFractionDigits:3}); }
+  function fmt2(n){ return Number(n || 0).toLocaleString("ro-RO",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+  function compute(data){
+    const volBuc = data.lungime !== "" && data.latime !== "" && data.grosime !== "" ? data.lungime * data.latime * data.grosime : "";
+    const volTot = volBuc !== "" && data.bucati !== "" ? volBuc * data.bucati : "";
+
+    let pretBucCalc = "";
+    if (data.pretMc !== "" && volBuc !== "") pretBucCalc = data.pretMc * volBuc;
+    else if (data.pretBuc !== "") pretBucCalc = data.pretBuc;
+
+    let pretMcCalc = "";
+    if (data.pretMc !== "") pretMcCalc = data.pretMc;
+    else if (data.pretBuc !== "" && volBuc !== "" && volBuc !== 0) pretMcCalc = data.pretBuc / volBuc;
+
+    const valTot = pretBucCalc !== "" && data.bucati !== "" ? pretBucCalc * data.bucati : "";
+    return {volBuc, volTot, pretBucCalc, pretMcCalc, valTot};
+  }
+
+  function currentInputData(){
+    return {
+      tip: els.tip.value,
+      lungime: parseNum(els.lungime.value),
+      latime: parseNum(els.latime.value),
+      grosime: parseNum(els.grosime.value),
+      bucati: parseNum(els.bucati.value),
+      pretBuc: parseNum(els.pretBuc.value),
+      pretMc: parseNum(els.pretMc.value)
+    };
+  }
+
+  function updatePreview(){
+    const c = compute(currentInputData());
+    els.prevVolBuc.value = c.volBuc === "" ? "" : fmt3(c.volBuc) + " mc";
+    els.prevVolTot.value = c.volTot === "" ? "" : fmt3(c.volTot) + " mc";
+    els.prevPretBuc.value = c.pretBucCalc === "" ? "" : fmt2(c.pretBucCalc) + " RON";
+    els.prevPretMc.value = c.pretMcCalc === "" ? "" : fmt2(c.pretMcCalc) + " RON";
+    els.prevValTot.value = c.valTot === "" ? "" : fmt2(c.valTot) + " RON";
+  }
+
+  function saveRows(){
+    localStorage.setItem("lemn_mobil_rows", JSON.stringify(rows));
+  }
+
+  function loadRows(){
+    try{
+      return JSON.parse(localStorage.getItem("lemn_mobil_rows") || "[]");
+    }catch{
+      return [];
+    }
+  }
+
+  function clearForm(){
+    ["tip","lungime","latime","grosime","bucati","pretBuc","pretMc"].forEach(k => els[k].value = "");
+    updatePreview();
+  }
+
+  function render(){
+    let totalVol = 0, totalVal = 0;
+    const summary = {};
+    TYPES.forEach(t => summary[t] = {rows:0, volum:0, valoare:0});
+
+    if (!rows.length){
+      els.items.innerHTML = '<div class="empty">Nu ai adăugat încă niciun material.</div>';
+    } else {
+      els.items.innerHTML = rows.map((r, i) => {
+        const c = compute(r);
+        totalVol += c.volTot === "" ? 0 : c.volTot;
+        totalVal += c.valTot === "" ? 0 : c.valTot;
+        if (summary[r.tip]) {
+          summary[r.tip].rows += 1;
+          summary[r.tip].volum += c.volTot === "" ? 0 : c.volTot;
+          summary[r.tip].valoare += c.valTot === "" ? 0 : c.valTot;
+        }
+        return `
+          <div class="item">
+            <div class="item-top">
+              <div>
+                <div class="item-title">${escapeHtml(r.tip || "Material")}</div>
+                <div class="item-sub">Poziția ${i + 1}</div>
+              </div>
+              <div class="badge">${c.volTot === "" ? "0,000 mc" : fmt3(c.volTot) + " mc"}</div>
+            </div>
+            <div class="item-grid">
+              <div class="kv"><span>Dimensiuni</span>${fmtMaybe(r.lungime)} × ${fmtMaybe(r.latime)} × ${fmtMaybe(r.grosime)} m</div>
+              <div class="kv"><span>Bucăți</span>${fmtMaybeInt(r.bucati)}</div>
+              <div class="kv"><span>Preț pe bucată</span>${c.pretBucCalc === "" ? "-" : fmt2(c.pretBucCalc) + " RON"}</div>
+              <div class="kv"><span>Preț pe mc</span>${c.pretMcCalc === "" ? "-" : fmt2(c.pretMcCalc) + " RON"}</div>
+              <div class="kv"><span>Volum pe bucată</span>${c.volBuc === "" ? "-" : fmt3(c.volBuc) + " mc"}</div>
+              <div class="kv"><span>Valoare totală</span>${c.valTot === "" ? "-" : fmt2(c.valTot) + " RON"}</div>
+            </div>
+            <div class="actions">
+              <button class="btn-secondary" onclick="editRow(${i})">Editează</button>
+              <button class="btn-danger" onclick="deleteRow(${i})">Șterge</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    els.volumTotal.textContent = fmt3(totalVol) + " mc";
+    els.valoareTotal.textContent = fmt2(totalVal) + " RON";
+
+    let html = '<table class="summary-table"><thead><tr><th>Tip</th><th>Poziții</th><th>Volum</th><th>Valoare</th><th>Medie / mc</th></tr></thead><tbody>';
+    let any = false;
+    TYPES.forEach(t => {
+      const s = summary[t];
+      if (s.rows > 0) any = true;
+      const med = s.volum ? s.valoare / s.volum : 0;
+      html += `<tr>
+        <td>${escapeHtml(t)}</td>
+        <td>${s.rows}</td>
+        <td>${fmt3(s.volum)} mc</td>
+        <td>${fmt2(s.valoare)} RON</td>
+        <td>${s.volum ? fmt2(med) + ' RON' : '-'}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    els.summaryWrap.innerHTML = any ? html : '<div class="empty">Sinteza va apărea după ce adaugi materiale.</div>';
+  }
+
+  function fmtMaybe(n){
+    return n === "" ? "-" : String(n).replace(".", ",");
+  }
+  function fmtMaybeInt(n){
+    return n === "" ? "-" : Number(n).toLocaleString("ro-RO");
+  }
+  function escapeHtml(text){
+    return String(text).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  window.deleteRow = (i) => {
+    if (!confirm("Ștergi această poziție?")) return;
+    rows.splice(i,1);
+    saveRows();
+    render();
+  };
+
+  window.editRow = (i) => {
+    const r = rows[i];
+    els.tip.value = r.tip || "";
+    els.lungime.value = r.lungime === "" ? "" : String(r.lungime).replace(".", ",");
+    els.latime.value = r.latime === "" ? "" : String(r.latime).replace(".", ",");
+    els.grosime.value = r.grosime === "" ? "" : String(r.grosime).replace(".", ",");
+    els.bucati.value = r.bucati === "" ? "" : String(r.bucati).replace(".", ",");
+    els.pretBuc.value = r.pretBuc === "" ? "" : String(r.pretBuc).replace(".", ",");
+    els.pretMc.value = r.pretMc === "" ? "" : String(r.pretMc).replace(".", ",");
+    rows.splice(i,1);
+    saveRows();
+    updatePreview();
+    render();
+    window.scrollTo({top:0, behavior:"smooth"});
+  };
+
+  document.querySelectorAll("input, select").forEach(el => {
+    if (el.id !== "prevVolBuc" && el.id !== "prevVolTot" && el.id !== "prevPretBuc" && el.id !== "prevPretMc" && el.id !== "prevValTot"){
+      el.addEventListener("input", updatePreview);
+      el.addEventListener("change", updatePreview);
+    }
+  });
+
+  document.getElementById("btnAdd").addEventListener("click", () => {
+    const d = currentInputData();
+    if (!d.tip) return alert("Alege tipul materialului.");
+    if (d.lungime === "" || d.latime === "" || d.grosime === "" || d.bucati === "") {
+      return alert("Completează lungime, lățime, grosime și numărul de bucăți.");
+    }
+    if (d.pretBuc === "" && d.pretMc === "") {
+      return alert("Introdu prețul pe bucată sau prețul pe mc.");
+    }
+    rows.push(d);
+    saveRows();
+    clearForm();
+    render();
+  });
+
+  document.getElementById("btnDemo").addEventListener("click", () => {
+    rows = [
+      {tip:"Grindă", lungime:4, latime:0.2, grosime:0.15, bucati:8, pretMc:1850, pretBuc:""},
+      {tip:"Scândură dimensionată", lungime:3.5, latime:0.18, grosime:0.025, bucati:25, pretBuc:28, pretMc:""},
+      {tip:"Cherestea", lungime:4, latime:0.12, grosime:0.05, bucati:16, pretMc:1600, pretBuc:""}
+    ];
+    saveRows();
+    clearForm();
+    render();
+  });
+
+  document.getElementById("btnClearAll").addEventListener("click", () => {
+    if (!confirm("Ștergi toate datele?")) return;
+    rows = [];
+    saveRows();
+    clearForm();
+    render();
+  });
+
+  function generatePdf(){
+    saveRows();
+    const jspdfNs = window.jspdf;
+    if (!jspdfNs || !jspdfNs.jsPDF){
+      alert("Biblioteca PDF nu s-a încărcat. Verifică internetul și încearcă din nou.");
+      return;
+    }
+
+    const { jsPDF } = jspdfNs;
+    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 12;
+    let y = 14;
+
+    const addPageIfNeeded = (needed = 8) => {
+      if (y + needed > pageH - 12){
+        doc.addPage();
+        y = 14;
+      }
+    };
+
+    const writeLine = (text, size = 11, gap = 6, bold = false) => {
+      doc.setFont('helvetica', bold ? 'bold' : 'normal');
+      doc.setFontSize(size);
+      const lines = doc.splitTextToSize(String(text), pageW - margin * 2);
+      addPageIfNeeded(lines.length * gap + 2);
+      doc.text(lines, margin, y);
+      y += lines.length * gap;
+    };
+
+    const now = new Date();
+    const dateStr = now.toLocaleString('ro-RO');
+    let totalVol = 0, totalVal = 0;
+
+    writeLine('Raport materiale lemnoase', 16, 7, true);
+    writeLine('Generat la: ' + dateStr, 10, 5);
+    writeLine('');
+
+    if (!rows.length){
+      writeLine('Nu există materiale în listă.', 12, 6);
+    } else {
+      rows.forEach((r, i) => {
+        const c = compute(r);
+        totalVol += c.volTot === "" ? 0 : c.volTot;
+        totalVal += c.valTot === "" ? 0 : c.valTot;
+
+        writeLine((i + 1) + '. ' + (r.tip || 'Material'), 12, 6, true);
+        writeLine('Dimensiuni: ' + fmtMaybe(r.lungime) + ' x ' + fmtMaybe(r.latime) + ' x ' + fmtMaybe(r.grosime) + ' m', 10, 5);
+        writeLine('Bucăți: ' + fmtMaybeInt(r.bucati), 10, 5);
+        writeLine('Volum pe bucată: ' + (c.volBuc === "" ? '-' : fmt3(c.volBuc) + ' mc'), 10, 5);
+        writeLine('Volum total: ' + (c.volTot === "" ? '-' : fmt3(c.volTot) + ' mc'), 10, 5);
+        writeLine('Preț pe bucată: ' + (c.pretBucCalc === "" ? '-' : fmt2(c.pretBucCalc) + ' RON'), 10, 5);
+        writeLine('Preț pe mc: ' + (c.pretMcCalc === "" ? '-' : fmt2(c.pretMcCalc) + ' RON'), 10, 5);
+        writeLine('Valoare totală: ' + (c.valTot === "" ? '-' : fmt2(c.valTot) + ' RON'), 10, 6);
+        y += 2;
+      });
+
+      writeLine('Total general', 13, 6, true);
+      writeLine('Volum total: ' + fmt3(totalVol) + ' mc', 11, 5);
+      writeLine('Valoare totală: ' + fmt2(totalVal) + ' RON', 11, 6);
+    }
+
+    const fileName = 'raport_materiale_lemnoase_' + now.toISOString().slice(0,19).replace(/[:T]/g,'-') + '.pdf';
+    doc.save(fileName);
+  }
+
+  document.getElementById("btnSave").addEventListener("click", generatePdf);
+
+  updatePreview();
+  render();
+})();
+</script>
+</body>
+</html>
